@@ -254,3 +254,119 @@ DELETE /api/orders/{id}                   - Xóa đơn hàng
 
 ## License
 MIT License
+
+
+
+// Use DBML to define your database structure
+// Docs: https://dbml.dbdiagram.io/docs
+
+Table brand {
+id char(36) [primary key]
+name varchar(100)
+origin varchar(100)
+description text
+}
+
+Table car_category {
+id char(36) [primary key]
+name varchar(100)
+description text
+}
+
+Table car {
+id char(36) [primary key]
+brand_id char(36)
+category_id char(36)
+name varchar(150)
+model_year year
+price decimal(15,2)
+color varchar(50)
+condition varchar(50)
+status varchar(50)
+specifications text
+description text
+created_at datetime
+updated_at datetime
+}
+
+Table customer {
+id char(36) [primary key]
+full_name varchar(100)
+phone varchar(20)
+email varchar(100)
+address varchar(255)
+created_at datetime
+}
+
+Table user_account {
+id char(36) [primary key]
+customer_id char(36)
+username varchar(50)
+password_hash varchar(255)
+role varchar(50)
+created_at datetime
+}
+
+Table employee {
+id char(36) [primary key]
+full_name varchar(100)
+email varchar(100)
+phone varchar(20)
+position varchar(50)
+hire_date date
+user_account_id char(36)
+}
+
+Table test_drive_request {
+id char(36) [primary key]
+customer_id char(36)
+car_id char(36)
+preferred_date date
+status varchar(50)
+note text
+created_at datetime
+}
+
+Table order_deposit {
+id char(36) [primary key]
+customer_id char(36)
+car_id char(36)
+employee_id char(36)
+order_date datetime
+deposit_amount decimal(15,2)
+total_price decimal(15,2)
+status varchar(50)
+}
+
+Table favorite_car {
+id char(36) [primary key]
+customer_id char(36)
+car_id char(36)
+added_at datetime
+}
+
+Table contact_request {
+id char(36) [primary key]
+customer_name varchar(100)
+email varchar(100)
+phone varchar(20)
+message text
+created_at datetime
+}
+
+// Relationships
+Ref: car.brand_id > brand.id
+Ref: car.category_id > car_category.id
+
+Ref: user_account.customer_id > customer.id
+Ref: employee.user_account_id > user_account.id
+
+Ref: test_drive_request.customer_id > customer.id
+Ref: test_drive_request.car_id > car.id
+
+Ref: order_deposit.customer_id > customer.id
+Ref: order_deposit.car_id > car.id
+Ref: order_deposit.employee_id > employee.id
+
+Ref: favorite_car.customer_id > customer.id
+Ref: favorite_car.car_id > car.id
