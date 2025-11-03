@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.GenericGenerator;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -17,10 +16,9 @@ import java.time.LocalDateTime;
 public class OrderDeposit {
     
     @Id
-    @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid2")
-    @Column(name = "id", length = 36)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "order_deposit_id")
+    private Integer orderDepositId;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", nullable = false)
@@ -49,7 +47,9 @@ public class OrderDeposit {
     
     @PrePersist
     protected void onCreate() {
-        orderDate = LocalDateTime.now();
+        if (orderDate == null) {
+            orderDate = LocalDateTime.now();
+        }
     }
     
     public enum OrderStatus {

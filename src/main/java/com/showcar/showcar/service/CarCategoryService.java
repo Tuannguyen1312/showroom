@@ -12,67 +12,71 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class CarCategoryService {
     
     private final CarCategoryRepository carCategoryRepository;
     
+    // Lấy tất cả categories
     public List<CarCategoryDTO> getAllCategories() {
         return carCategoryRepository.findAll().stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
     
-    public CarCategoryDTO getCategoryById(String id) {
+    // Lấy category theo ID
+    public CarCategoryDTO getCategoryById(Integer id) {
         CarCategory category = carCategoryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Category not found with id: " + id));
         return convertToDTO(category);
     }
     
-    public CarCategoryDTO getCategoryByName(String name) {
-        CarCategory category = carCategoryRepository.findByName(name)
-                .orElseThrow(() -> new RuntimeException("Category not found with name: " + name));
-        return convertToDTO(category);
-    }
-    
-    @Transactional
+    // Tạo category mới
     public CarCategoryDTO createCategory(CarCategoryDTO categoryDTO) {
         if (carCategoryRepository.existsByName(categoryDTO.getName())) {
-            throw new RuntimeException("Category already exists with name: " + categoryDTO.getName());
+            throw new RuntimeException("Category with name " + categoryDTO.getName() + " already exists");
         }
         
-        CarCategory category = new CarCategory();
-        category.setName(categoryDTO.getName());
-        category.setDescription(categoryDTO.getDescription());
-        
+        CarCategory category = convertToEntity(categoryDTO);
         CarCategory savedCategory = carCategoryRepository.save(category);
         return convertToDTO(savedCategory);
     }
     
-    @Transactional
-    public CarCategoryDTO updateCategory(String id, CarCategoryDTO categoryDTO) {
+    // Cập nhật category
+    public CarCategoryDTO updateCategory(Integer id, CarCategoryDTO categoryDTO) {
         CarCategory category = carCategoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+                .orElseThrow(() -> new RuntimeException("Category not found with id: " + id));
         
-        if (categoryDTO.getName() != null) category.setName(categoryDTO.getName());
-        if (categoryDTO.getDescription() != null) category.setDescription(categoryDTO.getDescription());
+        category.setName(categoryDTO.getName());
+        category.setDescription(categoryDTO.getDescription());
         
         CarCategory updatedCategory = carCategoryRepository.save(category);
         return convertToDTO(updatedCategory);
     }
     
-    @Transactional
-    public void deleteCategory(String id) {
+    // Xóa category
+    public void deleteCategory(Integer id) {
         if (!carCategoryRepository.existsById(id)) {
-            throw new RuntimeException("Category not found");
+            throw new RuntimeException("Category not found with id: " + id);
         }
         carCategoryRepository.deleteById(id);
     }
     
+    // Convert Entity to DTO
     private CarCategoryDTO convertToDTO(CarCategory category) {
         CarCategoryDTO dto = new CarCategoryDTO();
-        dto.setId(category.getId());
+        dto.setCategoryId(category.getCategoryId());
         dto.setName(category.getName());
         dto.setDescription(category.getDescription());
         return dto;
+    }
+    
+    // Convert DTO to Entity
+    private CarCategory convertToEntity(CarCategoryDTO dto) {
+        CarCategory category = new CarCategory();
+        category.setCategoryId(dto.getCategoryId());
+        category.setName(dto.getName());
+        category.setDescription(dto.getDescription());
+        return category;
     }
 }

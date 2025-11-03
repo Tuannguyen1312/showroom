@@ -4,9 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.GenericGenerator;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -17,10 +15,9 @@ import java.util.List;
 public class Customer {
     
     @Id
-    @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid2")
-    @Column(name = "id", length = 36)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "customer_id")
+    private Integer customerId;
     
     @Column(name = "full_name", nullable = false, length = 100)
     private String fullName;
@@ -31,11 +28,8 @@ public class Customer {
     @Column(name = "email", unique = true, length = 100)
     private String email;
     
-    @Column(name = "address")
+    @Column(name = "address", length = 255)
     private String address;
-    
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
     
     @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL)
     private UserAccount userAccount;
@@ -48,9 +42,4 @@ public class Customer {
     
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
     private List<FavoriteCar> favoriteCars;
-    
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-    }
 }

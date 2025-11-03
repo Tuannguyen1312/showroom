@@ -7,7 +7,9 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface CarCategoryRepository extends JpaRepository<CarCategory, String> {
+public interface CarCategoryRepository extends JpaRepository<CarCategory, Integer> {
+    
     Optional<CarCategory> findByName(String name);
+    
     boolean existsByName(String name);
 }

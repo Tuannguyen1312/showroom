@@ -1,6 +1,5 @@
 package com.showcar.showcar.dto;
 
-import com.showcar.showcar.model.TestDriveRequest;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,13 +11,13 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TestDriveRequestDTO {
-    private String id;
-    private String customerId;
+    private Integer testDriveRequestId;
+    private Integer customerId;
     private String customerName;
-    private String carId;
+    private Integer carId;
     private String carName;
     private LocalDate preferredDate;
-    private TestDriveRequest.TestDriveStatus status;
+    private String status; // "Pending", "Confirmed", "Completed", "Canceled"
     private String note;
     private LocalDateTime createdAt;
 }

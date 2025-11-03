@@ -1,0 +1,331 @@
+{
+  "info": {
+    "name": "ShowCar API Collection",
+    "description": "API Collection cho ShowCar Application",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Nguyễn Văn A\",\n  \"email\": \"test@example.com\",\n  \"phone\": \"0123456789\",\n  \"address\": \"123 Đường ABC\",\n  \"username\": \"testuser\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "register"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('token', jsonData.token);",
+                  "    console.log('Token saved:', jsonData.token);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"testuser\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('token', jsonData.token);",
+                  "    console.log('Token saved:', jsonData.token);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Cars (Public)",
+      "item": [
+        {
+          "name": "Get All Cars",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/cars",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "cars"]
+            }
+          }
+        },
+        {
+          "name": "Get Car by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/cars/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "cars", "1"]
+            }
+          }
+        },
+        {
+          "name": "Get Available Cars",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/cars/available",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "cars", "available"]
+            }
+          }
+        },
+        {
+          "name": "Search Cars",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/cars/search?keyword=toyota",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "cars", "search"],
+              "query": [
+                {
+                  "key": "keyword",
+                  "value": "toyota"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Brands (Public)",
+      "item": [
+        {
+          "name": "Get All Brands",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/brands",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "brands"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Favorites (Protected)",
+      "item": [
+        {
+          "name": "Get Customer Favorites",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/favorites/customer/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "favorites", "customer", "1"]
+            }
+          }
+        },
+        {
+          "name": "Add Favorite",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/favorites?customerId=1&carId=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "favorites"],
+              "query": [
+                {
+                  "key": "customerId",
+                  "value": "1"
+                },
+                {
+                  "key": "carId",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Remove Favorite",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/favorites?customerId=1&carId=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "favorites"],
+              "query": [
+                {
+                  "key": "customerId",
+                  "value": "1"
+                },
+                {
+                  "key": "carId",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Test Drives (Protected)",
+      "item": [
+        {
+          "name": "Create Test Drive Request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": 1,\n  \"carId\": 1,\n  \"preferredDate\": \"2024-12-25\",\n  \"note\": \"Muốn lái thử vào buổi sáng\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/test-drives",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "test-drives"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Orders (Protected)",
+      "item": [
+        {
+          "name": "Create Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": 1,\n  \"carId\": 1,\n  \"depositAmount\": 100000000,\n  \"totalPrice\": 1000000000,\n  \"status\": \"Pending\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/orders",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "orders"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Statistics (Admin)",
+      "item": [
+        {
+          "name": "Get Dashboard Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/statistics/dashboard",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "statistics", "dashboard"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
+

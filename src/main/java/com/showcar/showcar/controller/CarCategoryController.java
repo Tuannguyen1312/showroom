@@ -9,6 +9,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * REST API Controller cho Car Category (Danh mục xe: Sedan, SUV, Pickup...)
+ * Base URL: /api/categories
+ */
 @RestController
 @RequestMapping("/api/categories")
 @RequiredArgsConstructor
@@ -17,37 +21,71 @@ public class CarCategoryController {
     
     private final CarCategoryService carCategoryService;
     
+    /**
+     * Lấy tất cả danh mục xe
+     * GET /api/categories
+     */
     @GetMapping
     public ResponseEntity<List<CarCategoryDTO>> getAllCategories() {
-        return ResponseEntity.ok(carCategoryService.getAllCategories());
+        List<CarCategoryDTO> categories = carCategoryService.getAllCategories();
+        return ResponseEntity.ok(categories);
     }
     
+    /**
+     * Lấy danh mục theo ID
+     * GET /api/categories/{id}
+     */
     @GetMapping("/{id}")
-    public ResponseEntity<CarCategoryDTO> getCategoryById(@PathVariable String id) {
-        return ResponseEntity.ok(carCategoryService.getCategoryById(id));
+    public ResponseEntity<CarCategoryDTO> getCategoryById(@PathVariable Integer id) {
+        try {
+            CarCategoryDTO category = carCategoryService.getCategoryById(id);
+            return ResponseEntity.ok(category);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
     
-    @GetMapping("/name/{name}")
-    public ResponseEntity<CarCategoryDTO> getCategoryByName(@PathVariable String name) {
-        return ResponseEntity.ok(carCategoryService.getCategoryByName(name));
-    }
-    
+    /**
+     * Tạo danh mục mới (ADMIN)
+     * POST /api/categories
+     */
     @PostMapping
     public ResponseEntity<CarCategoryDTO> createCategory(@RequestBody CarCategoryDTO categoryDTO) {
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(carCategoryService.createCategory(categoryDTO));
+        try {
+            CarCategoryDTO created = carCategoryService.createCategory(categoryDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(created);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
     
+    /**
+     * Cập nhật danh mục (ADMIN)
+     * PUT /api/categories/{id}
+     */
     @PutMapping("/{id}")
     public ResponseEntity<CarCategoryDTO> updateCategory(
-            @PathVariable String id,
+            @PathVariable Integer id,
             @RequestBody CarCategoryDTO categoryDTO) {
-        return ResponseEntity.ok(carCategoryService.updateCategory(id, categoryDTO));
+        try {
+            CarCategoryDTO updated = carCategoryService.updateCategory(id, categoryDTO);
+            return ResponseEntity.ok(updated);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
     
+    /**
+     * Xóa danh mục (ADMIN)
+     * DELETE /api/categories/{id}
+     */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCategory(@PathVariable String id) {
-        carCategoryService.deleteCategory(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Void> deleteCategory(@PathVariable Integer id) {
+        try {
+            carCategoryService.deleteCategory(id);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

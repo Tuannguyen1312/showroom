@@ -1,6 +1,5 @@
 package com.showcar.showcar.dto;
 
-import com.showcar.showcar.model.OrderDeposit;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,15 +11,15 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderDepositDTO {
-    private String id;
-    private String customerId;
+    private Integer orderDepositId;
+    private Integer customerId;
     private String customerName;
-    private String carId;
+    private Integer carId;
     private String carName;
-    private String employeeId;
+    private Integer employeeId;
     private String employeeName;
     private LocalDateTime orderDate;
     private BigDecimal depositAmount;
     private BigDecimal totalPrice;
-    private OrderDeposit.OrderStatus status;
+    private String status; // "Pending", "Deposited", "Delivered", "Canceled"
 }

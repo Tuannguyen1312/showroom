@@ -1,6 +1,5 @@
 package com.showcar.showcar.dto;
 
-import com.showcar.showcar.model.Car;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,21 +12,20 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CarDTO {
-    private String id;
-    private String brandId;
+    private Integer carId;
+    private Integer brandId;
     private String brandName;
-    private String categoryId;
+    private Integer categoryId;
     private String categoryName;
     private String name;
     private Integer modelYear;
     private BigDecimal price;
     private String color;
-    private Car.CarCondition condition;
-    private Car.CarStatus status;
+    private String conditions; // "New" or "Used"
+    private String status; // "Available", "Sold", "Discontinued"
     private String specifications;
     private String description;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private List<CarImageDTO> images;
-    private String primaryImageUrl;
 }

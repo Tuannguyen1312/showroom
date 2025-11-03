@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface ContactRequestRepository extends JpaRepository<ContactRequest, String> {
+public interface ContactRequestRepository extends JpaRepository<ContactRequest, Integer> {
     
     List<ContactRequest> findByEmail(String email);
     

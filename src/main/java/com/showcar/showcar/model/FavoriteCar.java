@@ -4,24 +4,21 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.GenericGenerator;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "favorite_car", uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"customer_id", "car_id"})
-})
+@Table(name = "favorite_car", 
+       uniqueConstraints = @UniqueConstraint(columnNames = {"customer_id", "car_id"}))
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class FavoriteCar {
     
     @Id
-    @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid2")
-    @Column(name = "id", length = 36)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "favorite_car_id")
+    private Integer favoriteCarId;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", nullable = false)

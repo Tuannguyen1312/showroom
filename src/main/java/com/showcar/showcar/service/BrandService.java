@@ -12,70 +12,81 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class BrandService {
     
     private final BrandRepository brandRepository;
     
+    // Lấy tất cả brands
     public List<BrandDTO> getAllBrands() {
         return brandRepository.findAll().stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
     
-    public BrandDTO getBrandById(String id) {
+    // Lấy brand theo ID
+    public BrandDTO getBrandById(Integer id) {
         Brand brand = brandRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Brand not found with id: " + id));
         return convertToDTO(brand);
     }
     
-    public BrandDTO getBrandByName(String name) {
-        Brand brand = brandRepository.findByName(name)
-                .orElseThrow(() -> new RuntimeException("Brand not found with name: " + name));
-        return convertToDTO(brand);
-    }
-    
-    @Transactional
+    // Tạo brand mới
     public BrandDTO createBrand(BrandDTO brandDTO) {
         if (brandRepository.existsByName(brandDTO.getName())) {
-            throw new RuntimeException("Brand already exists with name: " + brandDTO.getName());
+            throw new RuntimeException("Brand with name " + brandDTO.getName() + " already exists");
         }
         
-        Brand brand = new Brand();
-        brand.setName(brandDTO.getName());
-        brand.setOrigin(brandDTO.getOrigin());
-        brand.setDescription(brandDTO.getDescription());
-        
+        Brand brand = convertToEntity(brandDTO);
         Brand savedBrand = brandRepository.save(brand);
         return convertToDTO(savedBrand);
     }
     
-    @Transactional
-    public BrandDTO updateBrand(String id, BrandDTO brandDTO) {
+    // Cập nhật brand
+    public BrandDTO updateBrand(Integer id, BrandDTO brandDTO) {
         Brand brand = brandRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Brand not found"));
+                .orElseThrow(() -> new RuntimeException("Brand not found with id: " + id));
         
-        if (brandDTO.getName() != null) brand.setName(brandDTO.getName());
-        if (brandDTO.getOrigin() != null) brand.setOrigin(brandDTO.getOrigin());
-        if (brandDTO.getDescription() != null) brand.setDescription(brandDTO.getDescription());
+        brand.setName(brandDTO.getName());
+        brand.setOrigin(brandDTO.getOrigin());
+        brand.setDescription(brandDTO.getDescription());
         
         Brand updatedBrand = brandRepository.save(brand);
         return convertToDTO(updatedBrand);
     }
     
-    @Transactional
-    public void deleteBrand(String id) {
+    // Xóa brand
+    public void deleteBrand(Integer id) {
         if (!brandRepository.existsById(id)) {
-            throw new RuntimeException("Brand not found");
+            throw new RuntimeException("Brand not found with id: " + id);
         }
         brandRepository.deleteById(id);
     }
     
+    // Tìm brand theo tên
+    public BrandDTO findByName(String name) {
+        Brand brand = brandRepository.findByName(name)
+                .orElseThrow(() -> new RuntimeException("Brand not found with name: " + name));
+        return convertToDTO(brand);
+    }
+    
+    // Convert Entity to DTO
     private BrandDTO convertToDTO(Brand brand) {
         BrandDTO dto = new BrandDTO();
-        dto.setId(brand.getId());
+        dto.setBrandId(brand.getBrandId());
         dto.setName(brand.getName());
         dto.setOrigin(brand.getOrigin());
         dto.setDescription(brand.getDescription());
         return dto;
+    }
+    
+    // Convert DTO to Entity
+    private Brand convertToEntity(BrandDTO dto) {
+        Brand brand = new Brand();
+        brand.setBrandId(dto.getBrandId());
+        brand.setName(dto.getName());
+        brand.setOrigin(dto.getOrigin());
+        brand.setDescription(dto.getDescription());
+        return brand;
     }
 }

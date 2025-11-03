@@ -12,84 +12,95 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class CustomerService {
     
     private final CustomerRepository customerRepository;
     
+    // Lấy tất cả customers
     public List<CustomerDTO> getAllCustomers() {
         return customerRepository.findAll().stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
     
-    public CustomerDTO getCustomerById(String id) {
+    // Lấy customer theo ID
+    public CustomerDTO getCustomerById(Integer id) {
         Customer customer = customerRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Customer not found with id: " + id));
         return convertToDTO(customer);
     }
     
-    public CustomerDTO getCustomerByEmail(String email) {
-        Customer customer = customerRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Customer not found with email: " + email));
-        return convertToDTO(customer);
-    }
-    
-    public CustomerDTO getCustomerByPhone(String phone) {
-        Customer customer = customerRepository.findByPhone(phone)
-                .orElseThrow(() -> new RuntimeException("Customer not found with phone: " + phone));
-        return convertToDTO(customer);
-    }
-    
-    @Transactional
+    // Tạo customer mới
     public CustomerDTO createCustomer(CustomerDTO customerDTO) {
-        if (customerDTO.getEmail() != null && customerRepository.existsByEmail(customerDTO.getEmail())) {
-            throw new RuntimeException("Customer already exists with email: " + customerDTO.getEmail());
+        if (customerRepository.existsByEmail(customerDTO.getEmail())) {
+            throw new RuntimeException("Customer with email " + customerDTO.getEmail() + " already exists");
         }
         
-        if (customerDTO.getPhone() != null && customerRepository.existsByPhone(customerDTO.getPhone())) {
-            throw new RuntimeException("Customer already exists with phone: " + customerDTO.getPhone());
+        if (customerRepository.existsByPhone(customerDTO.getPhone())) {
+            throw new RuntimeException("Customer with phone " + customerDTO.getPhone() + " already exists");
         }
         
-        Customer customer = new Customer();
+        Customer customer = convertToEntity(customerDTO);
+        Customer savedCustomer = customerRepository.save(customer);
+        return convertToDTO(savedCustomer);
+    }
+    
+    // Cập nhật customer
+    public CustomerDTO updateCustomer(Integer id, CustomerDTO customerDTO) {
+        Customer customer = customerRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Customer not found with id: " + id));
+        
         customer.setFullName(customerDTO.getFullName());
         customer.setPhone(customerDTO.getPhone());
         customer.setEmail(customerDTO.getEmail());
         customer.setAddress(customerDTO.getAddress());
         
-        Customer savedCustomer = customerRepository.save(customer);
-        return convertToDTO(savedCustomer);
-    }
-    
-    @Transactional
-    public CustomerDTO updateCustomer(String id, CustomerDTO customerDTO) {
-        Customer customer = customerRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Customer not found"));
-        
-        if (customerDTO.getFullName() != null) customer.setFullName(customerDTO.getFullName());
-        if (customerDTO.getPhone() != null) customer.setPhone(customerDTO.getPhone());
-        if (customerDTO.getEmail() != null) customer.setEmail(customerDTO.getEmail());
-        if (customerDTO.getAddress() != null) customer.setAddress(customerDTO.getAddress());
-        
         Customer updatedCustomer = customerRepository.save(customer);
         return convertToDTO(updatedCustomer);
     }
     
-    @Transactional
-    public void deleteCustomer(String id) {
+    // Xóa customer
+    public void deleteCustomer(Integer id) {
         if (!customerRepository.existsById(id)) {
-            throw new RuntimeException("Customer not found");
+            throw new RuntimeException("Customer not found with id: " + id);
         }
         customerRepository.deleteById(id);
     }
     
+    // Tìm customer theo email
+    public CustomerDTO findByEmail(String email) {
+        Customer customer = customerRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Customer not found with email: " + email));
+        return convertToDTO(customer);
+    }
+    
+    // Tìm customer theo phone
+    public CustomerDTO findByPhone(String phone) {
+        Customer customer = customerRepository.findByPhone(phone)
+                .orElseThrow(() -> new RuntimeException("Customer not found with phone: " + phone));
+        return convertToDTO(customer);
+    }
+    
+    // Convert Entity to DTO
     private CustomerDTO convertToDTO(Customer customer) {
         CustomerDTO dto = new CustomerDTO();
-        dto.setId(customer.getId());
+        dto.setCustomerId(customer.getCustomerId());
         dto.setFullName(customer.getFullName());
         dto.setPhone(customer.getPhone());
         dto.setEmail(customer.getEmail());
         dto.setAddress(customer.getAddress());
-        dto.setCreatedAt(customer.getCreatedAt());
         return dto;
+    }
+    
+    // Convert DTO to Entity
+    private Customer convertToEntity(CustomerDTO dto) {
+        Customer customer = new Customer();
+        customer.setCustomerId(dto.getCustomerId());
+        customer.setFullName(dto.getFullName());
+        customer.setPhone(dto.getPhone());
+        customer.setEmail(dto.getEmail());
+        customer.setAddress(dto.getAddress());
+        return customer;
     }
 }

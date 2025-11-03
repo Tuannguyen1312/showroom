@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ContactRequestDTO {
-    private String id;
+    private Integer contactRequestId;
     private String customerName;
     private String email;
     private String phone;

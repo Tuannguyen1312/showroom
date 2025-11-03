@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.GenericGenerator;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -18,10 +17,9 @@ import java.util.List;
 public class Car {
     
     @Id
-    @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid2")
-    @Column(name = "id", length = 36)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "car_id")
+    private Integer carId;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "brand_id", nullable = false)
@@ -44,8 +42,8 @@ public class Car {
     private String color;
     
     @Enumerated(EnumType.STRING)
-    @Column(name = "condition")
-    private CarCondition condition = CarCondition.New;
+    @Column(name = "conditions")
+    private CarCondition conditions = CarCondition.New;
     
     @Enumerated(EnumType.STRING)
     @Column(name = "status")

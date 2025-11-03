@@ -8,11 +8,11 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface CarImageRepository extends JpaRepository<CarImage, String> {
+public interface CarImageRepository extends JpaRepository<CarImage, Integer> {
     
-    List<CarImage> findByCarId(String carId);
+    List<CarImage> findByCar_CarId(Integer carId);
     
-    Optional<CarImage> findByCarIdAndIsPrimaryTrue(String carId);
+    Optional<CarImage> findByCar_CarIdAndIsPrimary(Integer carId, Boolean isPrimary);
     
-    void deleteByCarId(String carId);
+    void deleteByCar_CarId(Integer carId);
 }

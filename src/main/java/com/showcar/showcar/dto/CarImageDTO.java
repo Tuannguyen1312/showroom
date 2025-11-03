@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CarImageDTO {
-    private String id;
-    private String carId;
+    private Integer carImageId;
+    private Integer carId;
     private String imageUrl;
     private Boolean isPrimary;
 }

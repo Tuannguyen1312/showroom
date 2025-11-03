@@ -9,6 +9,7 @@ public class ShowcarApplication {
 	public static void main(String[] args) {
 
         SpringApplication.run(ShowcarApplication.class, args);
+
 	}
 
 }

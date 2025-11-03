@@ -4,9 +4,6 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.GenericGenerator;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "user_account")
@@ -16,10 +13,9 @@ import java.time.LocalDateTime;
 public class UserAccount {
     
     @Id
-    @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid2")
-    @Column(name = "id", length = 36)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_account_id")
+    private Integer userAccountId;
     
     @OneToOne
     @JoinColumn(name = "customer_id")
@@ -28,23 +24,15 @@ public class UserAccount {
     @Column(name = "username", unique = true, nullable = false, length = 50)
     private String username;
     
-    @Column(name = "password_hash", nullable = false)
+    @Column(name = "password_hash", nullable = false, length = 255)
     private String passwordHash;
     
     @Enumerated(EnumType.STRING)
     @Column(name = "role")
     private UserRole role = UserRole.customer;
     
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
-    
     @OneToOne(mappedBy = "userAccount", cascade = CascadeType.ALL)
     private Employee employee;
-    
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-    }
     
     public enum UserRole {
         customer, admin, sales, marketing

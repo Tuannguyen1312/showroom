@@ -10,10 +10,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FavoriteCarDTO {
-    private String id;
-    private String customerId;
-    private String carId;
+    private Integer favoriteCarId;
+    private Integer customerId;
+    private Integer carId;
     private String carName;
-    private String carImageUrl;
+    private String carBrand;
     private LocalDateTime addedAt;
 }
