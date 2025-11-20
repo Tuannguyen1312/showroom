@@ -61,7 +61,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/brands/**").permitAll()
                 .requestMatchers("/api/categories/**").permitAll()
                 .requestMatchers("/api/cars/**").permitAll()
-                .requestMatchers("/api/cars/**/images/**").permitAll()
+                .requestMatchers("/api/cars/{carId}/images/**").permitAll()
                 .requestMatchers("/api/contact/**").permitAll()
                 .requestMatchers("/error").permitAll()
                 // Customer endpoints

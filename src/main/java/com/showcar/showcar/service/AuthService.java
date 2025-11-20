@@ -1,8 +1,6 @@
 package com.showcar.showcar.service;
 
-import com.showcar.showcar.dto.JwtResponseDTO;
-import com.showcar.showcar.dto.LoginRequestDTO;
-import com.showcar.showcar.dto.RegisterRequestDTO;
+import com.showcar.showcar.dto.*;
 import com.showcar.showcar.model.Customer;
 import com.showcar.showcar.model.UserAccount;
 import com.showcar.showcar.repository.CustomerRepository;
@@ -28,67 +26,58 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider tokenProvider;
 
-    public JwtResponseDTO login(LoginRequestDTO loginRequest) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginRequest.getUsername(),
-                        loginRequest.getPassword()
-                )
-        );
+    // REGISTER
+    public RegisterResponseDTO register(RegisterRequestDTO request) {
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        
-        UserAccount userAccount = userAccountRepository.findByUsername(loginRequest.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        String jwt = tokenProvider.generateToken(userAccount.getUsername(), userAccount.getRole().name());
-        
-        JwtResponseDTO response = new JwtResponseDTO();
-        response.setToken(jwt);
-        response.setUsername(userAccount.getUsername());
-        response.setRole(userAccount.getRole().name());
-        response.setCustomerId(userAccount.getCustomer() != null ? userAccount.getCustomer().getCustomerId() : null);
-        
-        return response;
-    }
-
-    public JwtResponseDTO register(RegisterRequestDTO registerRequest) {
-        // Check if username already exists
-        if (userAccountRepository.existsByUsername(registerRequest.getUsername())) {
-            throw new RuntimeException("Username is already taken");
+        if (userAccountRepository.existsByUsername(request.getUsername())) {
+            throw new IllegalArgumentException("Username is already taken");
         }
 
-        // Check if email already exists
-        if (customerRepository.existsByEmail(registerRequest.getEmail())) {
-            throw new RuntimeException("Email is already registered");
+        if (customerRepository.existsByEmail(request.getEmail())) {
+            throw new IllegalArgumentException("Email is already registered");
         }
 
         // Create Customer
         Customer customer = new Customer();
-        customer.setFullName(registerRequest.getFullName());
-        customer.setPhone(registerRequest.getPhone());
-        customer.setEmail(registerRequest.getEmail());
-        customer.setAddress(registerRequest.getAddress());
+        customer.setFullName(request.getFullName());
+        customer.setPhone(request.getPhone());
+        customer.setEmail(request.getEmail());
+        customer.setAddress(request.getAddress());
         customer = customerRepository.save(customer);
 
         // Create UserAccount
         UserAccount userAccount = new UserAccount();
         userAccount.setCustomer(customer);
-        userAccount.setUsername(registerRequest.getUsername());
-        userAccount.setPasswordHash(passwordEncoder.encode(registerRequest.getPassword()));
+        userAccount.setUsername(request.getUsername());
+        userAccount.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         userAccount.setRole(UserAccount.UserRole.customer);
         userAccount = userAccountRepository.save(userAccount);
 
-        // Generate JWT token
-        String jwt = tokenProvider.generateToken(userAccount.getUsername(), userAccount.getRole().name());
+        String token = tokenProvider.generateToken(userAccount.getUsername(), userAccount.getRole().name());
 
-        JwtResponseDTO response = new JwtResponseDTO();
-        response.setToken(jwt);
-        response.setUsername(userAccount.getUsername());
-        response.setRole(userAccount.getRole().name());
-        response.setCustomerId(customer.getCustomerId());
+        return new RegisterResponseDTO(customer.getCustomerId(), userAccount.getUsername(),
+                userAccount.getRole().name(), token);
+    }
 
-        return response;
+    // LOGIN
+    public LoginResponseDTO login(LoginRequestDTO request) {
+
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
+        );
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        UserAccount userAccount = userAccountRepository.findByUsername(request.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        String token = tokenProvider.generateToken(userAccount.getUsername(), userAccount.getRole().name());
+
+        return new LoginResponseDTO(
+                userAccount.getCustomer() != null ? userAccount.getCustomer().getCustomerId() : null,
+                userAccount.getUsername(),
+                userAccount.getRole().name(),
+                token
+        );
     }
 }
-
